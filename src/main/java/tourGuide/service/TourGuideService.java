@@ -2,13 +2,7 @@ package tourGuide.service;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -21,6 +15,8 @@ import gpsUtil.location.Attraction;
 import gpsUtil.location.Location;
 import gpsUtil.location.VisitedLocation;
 import tourGuide.helper.InternalTestHelper;
+import tourGuide.model.UserNearestAttractions;
+import tourGuide.model.UserPositions;
 import tourGuide.tracker.Tracker;
 import tourGuide.user.User;
 import tourGuide.user.UserReward;
@@ -100,7 +96,34 @@ public class TourGuideService {
 		
 		return nearbyAttractions;
 	}
-	
+
+	public List<UserNearestAttractions> getClosestAttractions(VisitedLocation visitedLocation, User user) {
+
+		List<Attraction> attractions = gpsUtil.getAttractions();
+		List<UserNearestAttractions> allAttractions = attractions.parallelStream()
+				.map(a -> new UserNearestAttractions(a.attractionName, a.latitude, a.longitude, visitedLocation.location,
+						rewardsService.getDistance(a, visitedLocation.location),
+						rewardsService.getRewardPoints(a, user)))
+				.sorted(Comparator.comparingDouble(UserNearestAttractions::getAttractionProximity))
+				.collect(Collectors.toList());
+
+		List<UserNearestAttractions> closestAttractions = allAttractions.stream().
+				limit(user.getUserPreferences().getNumberOfProposalAttraction()).collect(Collectors.toList());
+
+		return closestAttractions;
+	}
+
+	public List<UserPositions> getAllUsersPositions () {
+
+		List<UserPositions> userPosition = internalUserMap.values().stream()
+				.map(u -> new UserPositions(u.getUserId(),
+						u.getVisitedLocations().stream().
+								map(l -> new Location(l.location.latitude,l.location.longitude)).collect(Collectors.toList())))
+				.collect(Collectors.toList());
+
+		return userPosition;
+	}
+
 	private void addShutDownHook() {
 		Runtime.getRuntime().addShutdownHook(new Thread() { 
 		      public void run() {
