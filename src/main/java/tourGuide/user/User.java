@@ -4,18 +4,23 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import gpsUtil.location.VisitedLocation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import tourGuide.service.RewardsService;
 import tripPricer.Provider;
 
 public class User {
+	private Logger logger = LoggerFactory.getLogger(RewardsService.class);
 	private final UUID userId;
 	private final String userName;
 	private String phoneNumber;
 	private String emailAddress;
 	private Date latestLocationTimestamp;
 	private List<VisitedLocation> visitedLocations = new ArrayList<>();
-	private List<UserReward> userRewards = new ArrayList<>();
+	private CopyOnWriteArrayList<UserReward> userRewards = new CopyOnWriteArrayList<>();
 	private UserPreferences userPreferences = new UserPreferences();
 	private List<Provider> tripDeals = new ArrayList<>();
 	public User(UUID userId, String userName, String phoneNumber, String emailAddress) {
@@ -70,12 +75,14 @@ public class User {
 	}
 	
 	public void addUserReward(UserReward userReward) {
+		//System.out.println("USer.addUSerReward");
+		//logger.debug("USer.addUSerReward");
 		if(userRewards.stream().filter(r -> r.attraction.attractionName.equals(userReward.attraction)).count() == 0) {
 			userRewards.add(userReward);
 		}
 	}
 	
-	public List<UserReward> getUserRewards() {
+	public CopyOnWriteArrayList<UserReward> getUserRewards() {
 		return userRewards;
 	}
 	

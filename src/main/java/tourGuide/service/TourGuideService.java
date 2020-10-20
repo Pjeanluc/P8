@@ -3,9 +3,13 @@ package tourGuide.service;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import org.javamoney.moneta.Money;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -17,11 +21,16 @@ import gpsUtil.location.VisitedLocation;
 import tourGuide.helper.InternalTestHelper;
 import tourGuide.model.UserNearestAttractions;
 import tourGuide.model.UserPositions;
+import tourGuide.model.UserPreferencesDTO;
 import tourGuide.tracker.Tracker;
 import tourGuide.user.User;
+import tourGuide.user.UserPreferences;
 import tourGuide.user.UserReward;
 import tripPricer.Provider;
 import tripPricer.TripPricer;
+
+import javax.money.CurrencyUnit;
+import javax.money.Monetary;
 
 @Service
 public class TourGuideService {
@@ -76,7 +85,15 @@ public class TourGuideService {
 		List<Provider> providers = tripPricer.getPrice(tripPricerApiKey, user.getUserId(), user.getUserPreferences().getNumberOfAdults(), 
 				user.getUserPreferences().getNumberOfChildren(), user.getUserPreferences().getTripDuration(), cumulatativeRewardPoints);
 		user.setTripDeals(providers);
-		return providers;
+
+		List<Provider> providersResult = new ArrayList<>();
+		for (Provider provider : providers) {
+			if ((provider.price <= user.getUserPreferences().getHighPricePoint().getNumber().doubleValue())
+					&& (provider.price >= user.getUserPreferences().getLowerPricePoint().getNumber().doubleValue())) {
+				providersResult.add(provider);
+			}
+		}
+		return providersResult;
 	}
 	
 	public VisitedLocation trackUserLocation(User user) {
@@ -86,15 +103,21 @@ public class TourGuideService {
 		return visitedLocation;
 	}
 
-	public List<Attraction> getNearByAttractions(VisitedLocation visitedLocation) {
-		List<Attraction> nearbyAttractions = new ArrayList<>();
-		for(Attraction attraction : gpsUtil.getAttractions()) {
-			if(rewardsService.isWithinAttractionProximity(attraction, visitedLocation.location)) {
-				nearbyAttractions.add(attraction);
-			}
+	public void trackListOfUserLocation(List<User> users) throws InterruptedException {
+		ExecutorService executorService = Executors.newFixedThreadPool(2000);
+
+		for (User user : users){
+			Runnable runnable = () -> {
+				trackUserLocation(user);
+			};
+
+			executorService.execute(runnable);
 		}
-		
-		return nearbyAttractions;
+
+		executorService.shutdown();
+		executorService.awaitTermination(25, TimeUnit.MINUTES);
+
+		return;
 	}
 
 	public List<UserNearestAttractions> getClosestAttractions(VisitedLocation visitedLocation, User user) {
@@ -122,6 +145,45 @@ public class TourGuideService {
 				.collect(Collectors.toList());
 
 		return userPosition;
+	}
+
+	public UserPreferencesDTO getUserPreference(String userName){
+
+		User user = getUser(userName);
+
+		UserPreferencesDTO userPreferenceDTO = new UserPreferencesDTO(
+				user.getUserPreferences().getAttractionProximity(),
+				user.getUserPreferences().getCurrency().getCurrencyCode(),
+				user.getUserPreferences().getLowerPricePoint().getNumber().doubleValue(),
+				user.getUserPreferences().getHighPricePoint().getNumber().doubleValue(),
+				user.getUserPreferences().getTripDuration(),
+				user.getUserPreferences().getTicketQuantity(),
+				user.getUserPreferences().getNumberOfAdults(),
+				user.getUserPreferences().getNumberOfChildren(),
+				user.getUserPreferences().getNumberOfProposalAttraction()
+				);
+		return userPreferenceDTO;
+	}
+
+	public UserPreferences setUserPreference(String userName, UserPreferencesDTO userPreferences){
+		UserPreferences userPreferencesResult = new UserPreferences();
+		User user = getUser(userName);
+		CurrencyUnit currency = Monetary.getCurrency(userPreferences.getCurrency());
+		Money lowerPricePoint = Money.of(userPreferences.getLowerPricePoint(), currency);
+		Money highPricePoint = Money.of(userPreferences.getHighPricePoint(), currency);
+
+		userPreferencesResult.setAttractionProximity(userPreferences.getAttractionProximity());
+		userPreferencesResult.setCurrency(currency);
+		userPreferencesResult.setLowerPricePoint(lowerPricePoint);
+		userPreferencesResult.setHighPricePoint(highPricePoint);
+		userPreferencesResult.setTripDuration(userPreferences.getTripDuration());
+		userPreferencesResult.setTicketQuantity(userPreferences.getTicketQuantity());
+		userPreferencesResult.setNumberOfAdults(userPreferences.getNumberOfAdults());
+		userPreferencesResult.setNumberOfProposalAttraction(userPreferences.getNumberOfProposalAttraction());
+
+		user.setUserPreferences(userPreferencesResult);
+
+		return userPreferencesResult;
 	}
 
 	private void addShutDownHook() {

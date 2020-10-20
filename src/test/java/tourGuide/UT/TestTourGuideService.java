@@ -1,25 +1,27 @@
-package tourGuide;
+package tourGuide.UT;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import java.util.List;
-import java.util.Locale;
-import java.util.UUID;
+import java.util.*;
 
-import org.junit.Ignore;
-import org.junit.Test;
+import org.javamoney.moneta.Money;
+import org.junit.jupiter.api.Test;
 
 import gpsUtil.GpsUtil;
-import gpsUtil.location.Attraction;
 import gpsUtil.location.VisitedLocation;
 import rewardCentral.RewardCentral;
 import tourGuide.helper.InternalTestHelper;
 import tourGuide.model.UserNearestAttractions;
+import tourGuide.model.UserPositions;
 import tourGuide.service.RewardsService;
 import tourGuide.service.TourGuideService;
 import tourGuide.user.User;
+import tourGuide.user.UserPreferences;
 import tripPricer.Provider;
+
+import javax.money.CurrencyUnit;
+import javax.money.Monetary;
 
 public class TestTourGuideService {
 
@@ -112,7 +114,8 @@ public class TestTourGuideService {
 		
 		assertEquals(5, userNearestAttractions.size());
 	}
-	
+
+	@Test
 	public void getTripDeals() {
 		GpsUtil gpsUtil = new GpsUtil();
 		RewardsService rewardsService = new RewardsService(gpsUtil, new RewardCentral());
@@ -125,8 +128,76 @@ public class TestTourGuideService {
 		
 		tourGuideService.tracker.stopTracking();
 		
-		assertEquals(10, providers.size());
+		assertEquals(5, providers.size());
 	}
-	
-	
+
+	@Test
+	public void getAllUsersPositions() {
+		Locale.setDefault(Locale.US);
+		GpsUtil gpsUtil = new GpsUtil();
+		RewardsService rewardsService = new RewardsService(gpsUtil, new RewardCentral());
+		InternalTestHelper.setInternalUserNumber(2);
+		TourGuideService tourGuideService = new TourGuideService(gpsUtil, rewardsService);
+
+		User user1 = new User(UUID.randomUUID(), "jon", "000", "jon@tourGuide.com");
+		User user2 = new User(UUID.randomUUID(), "jon", "000", "jon@tourGuide.com");
+
+		List<User> users = new ArrayList<>();
+		users.add(user1);
+		users.add(user2);
+
+		List<UserPositions> userPositions = tourGuideService.getAllUsersPositions();
+
+		tourGuideService.tracker.stopTracking();
+
+		assertEquals(2, userPositions.size());
+	}
+
+	@Test
+	public void getAllUser() {
+		Locale.setDefault(Locale.US);
+		GpsUtil gpsUtil = new GpsUtil();
+		RewardsService rewardsService = new RewardsService(gpsUtil, new RewardCentral());
+		InternalTestHelper.setInternalUserNumber(2);
+		TourGuideService tourGuideService = new TourGuideService(gpsUtil, rewardsService);
+
+		tourGuideService.tracker.stopTracking();
+
+		assertEquals(2, tourGuideService.getAllUsers().size());
+	}
+
+	@Test
+	public void getUserPreference() {
+		GpsUtil gpsUtil = new GpsUtil();
+		RewardsService rewardsService = new RewardsService(gpsUtil, new RewardCentral());
+		InternalTestHelper.setInternalUserNumber(2);
+		TourGuideService tourGuideService = new TourGuideService(gpsUtil, rewardsService);
+
+		User user = tourGuideService.getUser("internalUser1");
+		UserPreferences userPreferences = new UserPreferences();
+		CurrencyUnit currency = Monetary.getCurrency("USD");
+		Money lowerPricePoint = Money.of(1.0, currency);
+		Money highPricePoint = Money.of(100.0, currency);
+		userPreferences.setAttractionProximity(userPreferences.getAttractionProximity());
+		userPreferences.setCurrency(currency);
+		userPreferences.setLowerPricePoint(lowerPricePoint);
+		userPreferences.setHighPricePoint(highPricePoint);
+		userPreferences.setTripDuration(11);
+		userPreferences.setTicketQuantity(3);
+		userPreferences.setNumberOfAdults(4);
+		userPreferences.setNumberOfProposalAttraction(10);
+
+		user.setUserPreferences(userPreferences);
+
+
+		assertEquals("USD", tourGuideService.getUserPreference("internalUser1").getCurrency());
+		assertEquals("1.0", tourGuideService.getUserPreference("internalUser1").getLowerPricePoint().toString());
+		assertEquals("100.0", tourGuideService.getUserPreference("internalUser1").getHighPricePoint().toString());
+		assertEquals(11, tourGuideService.getUserPreference("internalUser1").getTripDuration());
+		assertEquals(3, tourGuideService.getUserPreference("internalUser1").getTicketQuantity());
+		assertEquals(4, tourGuideService.getUserPreference("internalUser1").getNumberOfAdults());
+		assertEquals(10, tourGuideService.getUserPreference("internalUser1").getNumberOfProposalAttraction());
+
+		tourGuideService.tracker.stopTracking();
+	}
 }

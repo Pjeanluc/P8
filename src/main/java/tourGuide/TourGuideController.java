@@ -2,24 +2,30 @@ package tourGuide;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.jsoniter.output.JsonStream;
 
 import gpsUtil.location.VisitedLocation;
+import tourGuide.exceptions.UserNameNotFoundException;
+import tourGuide.exceptions.UserPreferenceEmptyException;
 import tourGuide.model.UserNearestAttractions;
 import tourGuide.model.UserPositions;
+import tourGuide.model.UserPreferencesDTO;
 import tourGuide.service.TourGuideService;
 import tourGuide.user.User;
+import tourGuide.user.UserPreferences;
 import tripPricer.Provider;
 
 @RestController
 public class TourGuideController {
-//commentaire
-	@Autowired
+
+    private Logger logger = LoggerFactory.getLogger(TourGuideController.class);
+
+    @Autowired
 	TourGuideService tourGuideService;
 	
     @RequestMapping("/")
@@ -59,6 +65,34 @@ public class TourGuideController {
     
     private User getUser(String userName) {
     	return tourGuideService.getUser(userName);
+    }
+
+    @RequestMapping("/userPreference")
+    public UserPreferencesDTO getUserPreference(@RequestParam String userName) throws UserNameNotFoundException {
+
+        if (tourGuideService.getUser(userName) == null ) {
+            String message = " this username does not exist : "+ userName;
+            logger.error(message);
+            throw new UserNameNotFoundException(message);
+        }
+        return tourGuideService.getUserPreference(userName);
+
+    }
+
+    @PostMapping("/userPreference")
+    public UserPreferences createUserPreference(@RequestParam String userName, @RequestBody UserPreferencesDTO userPreference) throws UserNameNotFoundException, UserPreferenceEmptyException {
+        if (tourGuideService.getUser(userName) == null ) {
+            String message = " this username does not exist : "+ userName;
+            logger.error(message);
+            throw new UserNameNotFoundException(message);
+        }
+        if (userPreference == null ) {
+            String message = " userPreference is empty  ";
+            logger.error(message);
+            throw new UserPreferenceEmptyException(message);
+        }
+
+        return tourGuideService.setUserPreference(userName,userPreference);
     }
    
 
