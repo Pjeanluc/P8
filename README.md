@@ -10,7 +10,7 @@ You can get :
 - nearby attractions
 
 ## Model
-![] (DiagrammeModel.png)
+![](DiagrammeModel.PNG)
 
 ## Prerequisite to run
 
