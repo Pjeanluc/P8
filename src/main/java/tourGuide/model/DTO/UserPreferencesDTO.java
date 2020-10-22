@@ -1,4 +1,4 @@
-package tourGuide.model;
+package tourGuide.model.DTO;
 
 public class UserPreferencesDTO {
     private int attractionProximity;

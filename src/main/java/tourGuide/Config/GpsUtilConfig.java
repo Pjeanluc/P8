@@ -1,4 +1,4 @@
-package tourGuide;
+package tourGuide.Config;
 
 import gpsUtil.GpsUtil;
 import org.springframework.context.annotation.Bean;

@@ -21,11 +21,11 @@ import gpsUtil.location.VisitedLocation;
 import tourGuide.helper.InternalTestHelper;
 import tourGuide.model.UserNearestAttractions;
 import tourGuide.model.UserPositions;
-import tourGuide.model.UserPreferencesDTO;
+import tourGuide.model.DTO.UserPreferencesDTO;
 import tourGuide.tracker.Tracker;
-import tourGuide.user.User;
-import tourGuide.user.UserPreferences;
-import tourGuide.user.UserReward;
+import tourGuide.model.User;
+import tourGuide.model.UserPreferences;
+import tourGuide.model.UserReward;
 import tripPricer.Provider;
 import tripPricer.TripPricer;
 
@@ -34,7 +34,7 @@ import javax.money.Monetary;
 
 @Service
 public class TourGuideService {
-	private Logger logger = LoggerFactory.getLogger(TourGuideService.class);
+	private final Logger logger = LoggerFactory.getLogger(TourGuideService.class);
 	private final GpsUtil gpsUtil;
 	private final RewardsService rewardsService;
 	private final TripPricer tripPricer = new TripPricer();

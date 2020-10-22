@@ -1,4 +1,4 @@
-package tourGuide.user;
+package tourGuide.model;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -13,16 +13,19 @@ import tourGuide.service.RewardsService;
 import tripPricer.Provider;
 
 public class User {
-	private Logger logger = LoggerFactory.getLogger(RewardsService.class);
+	private final Logger logger = LoggerFactory.getLogger(RewardsService.class);
 	private final UUID userId;
 	private final String userName;
 	private String phoneNumber;
 	private String emailAddress;
 	private Date latestLocationTimestamp;
-	private List<VisitedLocation> visitedLocations = new ArrayList<>();
-	private CopyOnWriteArrayList<UserReward> userRewards = new CopyOnWriteArrayList<>();
+	private final List<VisitedLocation> visitedLocations = new ArrayList<>();
+	private final CopyOnWriteArrayList<UserReward> userRewards = new CopyOnWriteArrayList<>();
 	private UserPreferences userPreferences = new UserPreferences();
 	private List<Provider> tripDeals = new ArrayList<>();
+	private List<UserPositions> userPositions;
+	private List<UserNearestAttractions> nearestAttractions;
+
 	public User(UUID userId, String userName, String phoneNumber, String emailAddress) {
 		this.userId = userId;
 		this.userName = userName;
@@ -106,4 +109,19 @@ public class User {
 		return tripDeals;
 	}
 
+	public List<UserPositions> getUserPositions() {
+		return userPositions;
+	}
+
+	public void setUserPositions(List<UserPositions> userPositions) {
+		this.userPositions = userPositions;
+	}
+
+	public List<UserNearestAttractions> getNearestAttractions() {
+		return nearestAttractions;
+	}
+
+	public void setNearestAttractions(List<UserNearestAttractions> nearestAttractions) {
+		this.nearestAttractions = nearestAttractions;
+	}
 }

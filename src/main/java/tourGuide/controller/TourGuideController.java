@@ -1,4 +1,4 @@
-package tourGuide;
+package tourGuide.controller;
 
 import java.util.List;
 
@@ -14,16 +14,16 @@ import tourGuide.exceptions.UserNameNotFoundException;
 import tourGuide.exceptions.UserPreferenceEmptyException;
 import tourGuide.model.UserNearestAttractions;
 import tourGuide.model.UserPositions;
-import tourGuide.model.UserPreferencesDTO;
+import tourGuide.model.DTO.UserPreferencesDTO;
 import tourGuide.service.TourGuideService;
-import tourGuide.user.User;
-import tourGuide.user.UserPreferences;
+import tourGuide.model.User;
+import tourGuide.model.UserPreferences;
 import tripPricer.Provider;
 
 @RestController
 public class TourGuideController {
 
-    private Logger logger = LoggerFactory.getLogger(TourGuideController.class);
+    private final Logger logger = LoggerFactory.getLogger(TourGuideController.class);
 
     @Autowired
 	TourGuideService tourGuideService;
@@ -33,31 +33,31 @@ public class TourGuideController {
         return "Greetings from TourGuide!";
     }
     
-    @RequestMapping("/getLocation") 
+    @RequestMapping("/location")
     public String getLocation(@RequestParam String userName) {
     	VisitedLocation visitedLocation = tourGuideService.getUserLocation(getUser(userName));
 		return JsonStream.serialize(visitedLocation.location);
     }
     
 
-    @RequestMapping("/getNearbyAttractions")
+    @RequestMapping("/nearbyAttractions")
     public List<UserNearestAttractions> getNearbyAttractions(@RequestParam String userName) {
         VisitedLocation visitedLocation = tourGuideService.getUserLocation(getUser(userName));
         return tourGuideService.getClosestAttractions(visitedLocation,getUser(userName));
     }
     
-    @RequestMapping("/getRewards") 
+    @RequestMapping("/rewards")
     public String getRewards(@RequestParam String userName) {
     	return JsonStream.serialize(tourGuideService.getUserRewards(getUser(userName)));
     }
 
-    @RequestMapping("/getAllCurrentLocations")
+    @RequestMapping("/allCurrentLocations")
     public List<UserPositions> getAllCurrentLocations() {
 
         return tourGuideService.getAllUsersPositions();
     }
 
-    @RequestMapping("/getTripDeals")
+    @RequestMapping("/tripDeals")
     public String getTripDeals(@RequestParam String userName) {
     	List<Provider> providers = tourGuideService.getTripDeals(getUser(userName));
     	return JsonStream.serialize(providers);

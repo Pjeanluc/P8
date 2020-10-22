@@ -16,8 +16,8 @@ import tourGuide.model.UserNearestAttractions;
 import tourGuide.model.UserPositions;
 import tourGuide.service.RewardsService;
 import tourGuide.service.TourGuideService;
-import tourGuide.user.User;
-import tourGuide.user.UserPreferences;
+import tourGuide.model.User;
+import tourGuide.model.UserPreferences;
 import tripPricer.Provider;
 
 import javax.money.CurrencyUnit;
