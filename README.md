@@ -14,7 +14,7 @@ You can get :
 
 ## Prerequisite to run
 
-- Java 1.8
+- Java 1.8 JDK
 - Gradle 6.6.1
 - Docker
 
