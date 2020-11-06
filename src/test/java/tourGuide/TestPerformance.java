@@ -11,8 +11,8 @@ import org.junit.jupiter.api.Test;
 import gpsUtil.GpsUtil;
 import gpsUtil.location.Attraction;
 import gpsUtil.location.VisitedLocation;
-import rewardCentral.RewardCentral;
 import tourGuide.helper.InternalTestHelper;
+import tourGuide.proxy.RewardCentralProxy;
 import tourGuide.service.RewardsService;
 import tourGuide.service.TourGuideService;
 import tourGuide.model.User;
@@ -43,9 +43,9 @@ public class TestPerformance {
 	public void highVolumeTrackLocation() throws InterruptedException {
 		Locale.setDefault(Locale.US);
 		GpsUtil gpsUtil = new GpsUtil();
-		RewardsService rewardsService = new RewardsService(gpsUtil, new RewardCentral());
+		RewardsService rewardsService = new RewardsService(gpsUtil, new RewardCentralProxy());
 		// Users should be incremented up to 100,000, and test finishes within 15 minutes
-		InternalTestHelper.setInternalUserNumber(1);
+		InternalTestHelper.setInternalUserNumber(10000);
 		TourGuideService tourGuideService = new TourGuideService(gpsUtil, rewardsService);
 
 		List<User> allUsers = tourGuideService.getAllUsers();
@@ -66,23 +66,25 @@ public class TestPerformance {
 
 	@Test
 	public void highVolumeGetRewards() throws InterruptedException {
+
+
 		Locale.setDefault(Locale.US);
 		GpsUtil gpsUtil = new GpsUtil();
-		RewardsService rewardsService = new RewardsService(gpsUtil, new RewardCentral());
+		RewardsService rewardsService = new RewardsService(gpsUtil, new RewardCentralProxy());
 
 		// Users should be incremented up to 100,000, and test finishes within 20 minutes
 		InternalTestHelper.setInternalUserNumber(1);
 		StopWatch stopWatch = new StopWatch();
 		stopWatch.start();
 		TourGuideService tourGuideService = new TourGuideService(gpsUtil, rewardsService);
+		tourGuideService.tracker.stopTracking();
 		
 	    Attraction attraction = gpsUtil.getAttractions().get(0);
 		List<User> allUsers = new ArrayList<>();
 		allUsers = tourGuideService.getAllUsers();
 
-		ExecutorService executorService = Executors.newFixedThreadPool(2000);
-		//ExecutorService executorService = new ThreadPoolExecutor(1, 1, 1000,
-		//		TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
+		ExecutorService executorService = Executors.newFixedThreadPool(1000);
+
 
 		for(User user : allUsers) {
 

@@ -40,7 +40,7 @@ public class TourGuideService {
 	private final TripPricer tripPricer = new TripPricer();
 	public final Tracker tracker;
 	boolean testMode = true;
-	
+
 	public TourGuideService(GpsUtil gpsUtil, RewardsService rewardsService) {
 		this.gpsUtil = gpsUtil;
 		this.rewardsService = rewardsService;
@@ -104,7 +104,7 @@ public class TourGuideService {
 	}
 
 	public void trackListOfUserLocation(List<User> users) throws InterruptedException {
-		ExecutorService executorService = Executors.newFixedThreadPool(2000);
+		ExecutorService executorService = Executors.newFixedThreadPool(1000);
 
 		for (User user : users){
 			Runnable runnable = () -> {

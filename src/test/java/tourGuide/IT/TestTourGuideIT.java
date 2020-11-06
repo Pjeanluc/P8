@@ -10,9 +10,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import rewardCentral.RewardCentral;
 import tourGuide.helper.InternalTestHelper;
 
+import tourGuide.proxy.RewardCentralProxy;
 import tourGuide.service.RewardsService;
 import tourGuide.service.TourGuideService;
 
@@ -29,15 +29,14 @@ public class TestTourGuideIT {
     @Autowired
     protected MockMvc mockMvc;
 
-
     @Test
     public void getUserLocationTestIT() throws Exception {
         GpsUtil gpsUtil = new GpsUtil();
-        RewardsService rewardsService = new RewardsService(gpsUtil, new RewardCentral());
+        RewardsService rewardsService = new RewardsService(gpsUtil, new RewardCentralProxy());
         InternalTestHelper.setInternalUserNumber(1);
         TourGuideService tourGuideService = new TourGuideService(gpsUtil, rewardsService);
 
-        this.mockMvc.perform(get("/getLocation")
+        this.mockMvc.perform(get("/location")
                 .param("userName", "internalUser1")
         )
                 .andDo(print())
@@ -48,11 +47,11 @@ public class TestTourGuideIT {
     @Test
     public void getNearbyAttractions() throws Exception {
         GpsUtil gpsUtil = new GpsUtil();
-        RewardsService rewardsService = new RewardsService(gpsUtil, new RewardCentral());
+        RewardsService rewardsService = new RewardsService(gpsUtil, new RewardCentralProxy());
         InternalTestHelper.setInternalUserNumber(1);
         TourGuideService tourGuideService = new TourGuideService(gpsUtil, rewardsService);
 
-        this.mockMvc.perform(get("/getNearbyAttractions")
+        this.mockMvc.perform(get("/nearbyAttractions")
                 .param("userName", "internalUser1")
         )
                 .andDo(print())
@@ -63,11 +62,11 @@ public class TestTourGuideIT {
     @Test
     public void getTripDeals() throws Exception {
         GpsUtil gpsUtil = new GpsUtil();
-        RewardsService rewardsService = new RewardsService(gpsUtil, new RewardCentral());
+        RewardsService rewardsService = new RewardsService(gpsUtil, new RewardCentralProxy());
         InternalTestHelper.setInternalUserNumber(1);
         TourGuideService tourGuideService = new TourGuideService(gpsUtil, rewardsService);
 
-        this.mockMvc.perform(get("/getTripDeals")
+        this.mockMvc.perform(get("/tripDeals")
                 .param("userName", "internalUser1")
         )
                 .andDo(print())
@@ -78,7 +77,7 @@ public class TestTourGuideIT {
     @Test
     public void getUserPreference() throws Exception {
         GpsUtil gpsUtil = new GpsUtil();
-        RewardsService rewardsService = new RewardsService(gpsUtil, new RewardCentral());
+        RewardsService rewardsService = new RewardsService(gpsUtil, new RewardCentralProxy());
         InternalTestHelper.setInternalUserNumber(1);
         TourGuideService tourGuideService = new TourGuideService(gpsUtil, rewardsService);
 
@@ -93,7 +92,7 @@ public class TestTourGuideIT {
     @Test
     public void postUserPreferenceForUserNotExist() throws Exception {
         GpsUtil gpsUtil = new GpsUtil();
-        RewardsService rewardsService = new RewardsService(gpsUtil, new RewardCentral());
+        RewardsService rewardsService = new RewardsService(gpsUtil, new RewardCentralProxy());
         InternalTestHelper.setInternalUserNumber(1);
         TourGuideService tourGuideService = new TourGuideService(gpsUtil, rewardsService);
 
@@ -108,7 +107,7 @@ public class TestTourGuideIT {
     @Test
     public void postUserPreferenceWithoutUserpreferences() throws Exception {
         GpsUtil gpsUtil = new GpsUtil();
-        RewardsService rewardsService = new RewardsService(gpsUtil, new RewardCentral());
+        RewardsService rewardsService = new RewardsService(gpsUtil, new RewardCentralProxy());
         InternalTestHelper.setInternalUserNumber(1);
         TourGuideService tourGuideService = new TourGuideService(gpsUtil, rewardsService);
 
@@ -123,7 +122,7 @@ public class TestTourGuideIT {
     @Test
     public void postUserPreference() throws Exception {
         GpsUtil gpsUtil = new GpsUtil();
-        RewardsService rewardsService = new RewardsService(gpsUtil, new RewardCentral());
+        RewardsService rewardsService = new RewardsService(gpsUtil, new RewardCentralProxy());
         InternalTestHelper.setInternalUserNumber(1);
         TourGuideService tourGuideService = new TourGuideService(gpsUtil, rewardsService);
 

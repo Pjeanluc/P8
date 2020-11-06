@@ -13,9 +13,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import rewardCentral.RewardCentral;
 import tourGuide.helper.InternalTestHelper;
 import tourGuide.model.DTO.UserPreferencesDTO;
+import tourGuide.proxy.RewardCentralProxy;
 import tourGuide.service.RewardsService;
 import tourGuide.service.TourGuideService;
 import tourGuide.model.User;
@@ -39,7 +39,7 @@ public class TestTourGuideController {
     @BeforeEach
     void init() {
         GpsUtil gpsUtil = new GpsUtil();
-        RewardsService rewardsService = new RewardsService(gpsUtil, new RewardCentral());
+        RewardsService rewardsService = new RewardsService(gpsUtil, new RewardCentralProxy());
         InternalTestHelper.setInternalUserNumber(1);
         TourGuideService tourGuideService = new TourGuideService(gpsUtil, rewardsService);
         tourGuideService.tracker.stopTracking();
@@ -66,7 +66,7 @@ public class TestTourGuideController {
         VisitedLocation visitedLocationMock = new VisitedLocation(user.getUserId(),locationMock,date);
 
         Mockito.when( tourGuideService.getUserLocation(tourGuideService.getUser(anyString()))).thenReturn(visitedLocationMock);
-        this.mockMvc.perform(get("/getLocation")
+        this.mockMvc.perform(get("/location")
                     .param("userName", user.getUserName())
         )
                 .andDo(print())
@@ -104,7 +104,7 @@ public class TestTourGuideController {
     public void getUserPreferenceWithUSerExistTest() throws Exception {
 
         GpsUtil gpsUtil = new GpsUtil();
-        RewardsService rewardsService = new RewardsService(gpsUtil, new RewardCentral());
+        RewardsService rewardsService = new RewardsService(gpsUtil, new RewardCentralProxy());
         InternalTestHelper.setInternalUserNumber(1);
 
         UserPreferencesDTO userPreferencesDTO = new UserPreferencesDTO();

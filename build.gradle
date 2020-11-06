@@ -42,7 +42,7 @@ dependencies {
     compile group: 'com.jsoniter', name: 'jsoniter', version: '0.9.23'
 
     compile(name:'gpsUtil', ext:'jar')
-    compile(name:'RewardCentral', ext:'jar')
+    //compile(name:'RewardCentral', ext:'jar')
     compile(name:'TripPricer', ext:'jar')
 
     //testCompile("junit:junit")

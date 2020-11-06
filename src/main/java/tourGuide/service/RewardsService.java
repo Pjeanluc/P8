@@ -2,8 +2,6 @@ package tourGuide.service;
 
 
 import java.util.concurrent.CopyOnWriteArrayList;
-
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -12,9 +10,10 @@ import gpsUtil.GpsUtil;
 import gpsUtil.location.Attraction;
 import gpsUtil.location.Location;
 import gpsUtil.location.VisitedLocation;
-import rewardCentral.RewardCentral;
+
 import tourGuide.model.User;
 import tourGuide.model.UserReward;
+import tourGuide.proxy.RewardCentralProxy;
 
 @Service
 public class RewardsService {
@@ -23,15 +22,15 @@ public class RewardsService {
 	// proximity in miles
     private final int defaultProximityBuffer = 10;
 	private int proximityBuffer = defaultProximityBuffer;
-	private final int attractionProximityRange = 200;
+	private final int attractionProximityRange = 2000;
 	private final GpsUtil gpsUtil;
-	private final RewardCentral rewardsCentral;
+	private final RewardCentralProxy rewardsCentralProxy;
 
-	private final Logger logger = LoggerFactory.getLogger(RewardsService.class);
+	//private final Logger logger = LoggerFactory.getLogger(RewardsService.class);
 	
-	public RewardsService(GpsUtil gpsUtil, RewardCentral rewardCentral) {
+	public RewardsService(GpsUtil gpsUtil, RewardCentralProxy rewardCentralProxy) {
 		this.gpsUtil = gpsUtil;
-		this.rewardsCentral = rewardCentral;
+		this.rewardsCentralProxy = rewardCentralProxy;
 	}
 	
 	public void setProximityBuffer(int proximityBuffer) {
@@ -43,7 +42,7 @@ public class RewardsService {
 	}
 	
 	public void calculateRewards(User user) {
-		//logger.debug("calculateReward");
+		//
 		CopyOnWriteArrayList<Attraction> attractions = new CopyOnWriteArrayList<>() ;
 		CopyOnWriteArrayList<VisitedLocation> userLocations = new CopyOnWriteArrayList<>();
 
@@ -55,7 +54,8 @@ public class RewardsService {
 			{
 				if(user.getUserRewards().stream().filter(r -> r.attraction.attractionName.equals(attraction.attractionName)).count() == 0) {
 					if(nearAttraction(visitedLocation, attraction)) {
-						user.addUserReward(new UserReward(visitedLocation, attraction, getRewardPoints(attraction, user)));
+						//logger.debug("addreward");
+						user.addUserReward(new UserReward(visitedLocation, attraction, rewardsCentralProxy.getRewardPointsExterne(attraction, user)));
 					}
 				}
 			});
@@ -71,11 +71,47 @@ public class RewardsService {
 
 		return !(getDistance(locationVisitedLocation, visitedLocation.location) > proximityBuffer);
 	}
-	
+
 	public int getRewardPoints(Attraction attraction, User user) {
-		return rewardsCentral.getAttractionRewardPoints(attraction.attractionId, user.getUserId());
+		//logger.debug("getRewardPoints");
+		int rewardPoint = rewardsCentralProxy.getRewardPointsExterne(attraction, user);
+		//logger.debug("rewartPoint : "+rewartPoint);
+		//return rewardsCentral.getAttractionRewardPoints(attraction.attractionId, user.getUserId());
+		return rewardPoint;
 	}
-	
+
+	 /**
+	public int getRewardPointsExterne(Attraction attraction, User user) {
+		logger.debug("getRewardPointsExterne");
+		String rewardCentralURL = "http://localhost:8081/AttractionRewardPoints/?";
+		String paramAttractionUUID = "attractionId=" + attraction.attractionId;
+		String paramUserUUID = "userId=" + user.getUserId();
+
+		int rewardPoint = 0;
+
+		RestTemplate restTemplate = new RestTemplate();
+		HttpHeaders httpHeaders = new HttpHeaders();
+		httpHeaders.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+		httpHeaders.setContentType(MediaType.APPLICATION_JSON);
+
+		ResponseEntity<Integer> result = null;
+		try {
+			result = restTemplate.getForEntity(rewardCentralURL
+					+paramAttractionUUID
+					+"&"
+					+paramUserUUID
+					,Integer.class);
+		} catch (RestClientException e) {
+			return rewardPoint;
+		}
+
+		rewardPoint = result.getBody();
+
+		logger.debug("rewartPoint : "+rewardPoint);
+		//return rewardsCentral.getAttractionRewardPoints(attraction.attractionId, user.getUserId());
+		return rewardPoint;
+	}
+	 **/
 	public double getDistance(Location loc1, Location loc2) {
         double lat1 = Math.toRadians(loc1.latitude);
         double lon1 = Math.toRadians(loc1.longitude);

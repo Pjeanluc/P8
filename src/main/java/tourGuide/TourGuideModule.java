@@ -4,7 +4,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import gpsUtil.GpsUtil;
-import rewardCentral.RewardCentral;
+import tourGuide.proxy.RewardCentralProxy;
 import tourGuide.service.RewardsService;
 
 @Configuration
@@ -21,8 +21,8 @@ public class TourGuideModule {
 	}
 	
 	@Bean
-	public RewardCentral getRewardCentral() {
-		return new RewardCentral();
+	public RewardCentralProxy getRewardCentral() {
+		return new RewardCentralProxy();
 	}
 	
 }

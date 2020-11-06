@@ -63,7 +63,7 @@ public class TourGuideController {
     	return JsonStream.serialize(providers);
     }
     
-    private User getUser(String userName) {
+    public User getUser(String userName) {
     	return tourGuideService.getUser(userName);
     }
 
