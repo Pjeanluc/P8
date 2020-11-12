@@ -32,31 +32,50 @@ public class TourGuideController {
     public String index() {
         return "Greetings from TourGuide!";
     }
-    
+
+    /**
+     * @param userName
+     * @return location of the userName
+     */
     @RequestMapping("/location")
     public String getLocation(@RequestParam String userName) {
     	VisitedLocation visitedLocation = tourGuideService.getUserLocation(getUser(userName));
 		return JsonStream.serialize(visitedLocation.location);
     }
-    
 
+
+    /**
+     * @param userName
+     * @return list of the nearby attraction for the username
+     */
     @RequestMapping("/nearbyAttractions")
     public List<UserNearestAttractions> getNearbyAttractions(@RequestParam String userName) {
         VisitedLocation visitedLocation = tourGuideService.getUserLocation(getUser(userName));
         return tourGuideService.getClosestAttractions(visitedLocation,getUser(userName));
     }
-    
+
+    /**
+     * @param userName
+     * @return rewards for the username
+     */
     @RequestMapping("/rewards")
     public String getRewards(@RequestParam String userName) {
     	return JsonStream.serialize(tourGuideService.getUserRewards(getUser(userName)));
     }
 
+    /**
+     * @return return the list of all position of all users
+     */
     @RequestMapping("/allCurrentLocations")
     public List<UserPositions> getAllCurrentLocations() {
 
         return tourGuideService.getAllUsersPositions();
     }
 
+    /**
+     * @param userName
+     * @return proposition of trip
+     */
     @RequestMapping("/tripDeals")
     public String getTripDeals(@RequestParam String userName) {
     	List<Provider> providers = tourGuideService.getTripDeals(getUser(userName));
@@ -67,6 +86,11 @@ public class TourGuideController {
     	return tourGuideService.getUser(userName);
     }
 
+    /**
+     * @param userName
+     * @return list of the user's preference
+     * @throws UserNameNotFoundException
+     */
     @RequestMapping("/userPreference")
     public UserPreferencesDTO getUserPreference(@RequestParam String userName) throws UserNameNotFoundException {
 
@@ -79,6 +103,13 @@ public class TourGuideController {
 
     }
 
+    /**
+     * @param userName
+     * @param userPreference
+     * @return list of the user's preferences updated
+     * @throws UserNameNotFoundException
+     * @throws UserPreferenceEmptyException
+     */
     @PostMapping("/userPreference")
     public UserPreferences createUserPreference(@RequestParam String userName, @RequestBody UserPreferencesDTO userPreference) throws UserNameNotFoundException, UserPreferenceEmptyException {
         if (tourGuideService.getUser(userName) == null ) {

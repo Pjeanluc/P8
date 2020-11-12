@@ -120,6 +120,12 @@ public class TourGuideService {
 		return;
 	}
 
+	/**
+	 * list the nearby attraction for the user. The number of attraction is a user's preference
+	 * @param visitedLocation
+	 * @param user
+	 * @return list of nearestAttraction
+	 */
 	public List<UserNearestAttractions> getClosestAttractions(VisitedLocation visitedLocation, User user) {
 
 		List<Attraction> attractions = gpsUtil.getAttractions();
@@ -136,6 +142,10 @@ public class TourGuideService {
 		return closestAttractions;
 	}
 
+	/**
+	 *  return list the position for all user
+	 * @return list of all user's position
+	 */
 	public List<UserPositions> getAllUsersPositions () {
 
 		List<UserPositions> userPosition = internalUserMap.values().stream()
@@ -147,6 +157,11 @@ public class TourGuideService {
 		return userPosition;
 	}
 
+	/**
+	 * return the list of the user's preference
+	 * @param userName
+	 * @return the user's preference
+	 */
 	public UserPreferencesDTO getUserPreference(String userName){
 
 		User user = getUser(userName);
@@ -165,6 +180,12 @@ public class TourGuideService {
 		return userPreferenceDTO;
 	}
 
+	/**
+	 * update the user's preference
+	 * @param userName
+	 * @param userPreferences
+	 * @return the user's preferences updated
+	 */
 	public UserPreferences setUserPreference(String userName, UserPreferencesDTO userPreferences){
 		UserPreferences userPreferencesResult = new UserPreferences();
 		User user = getUser(userName);

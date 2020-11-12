@@ -18,6 +18,11 @@ public class RewardCentralProxy {
 
     private final Logger logger = LoggerFactory.getLogger(RewardsService.class);
 
+    /**
+     * @param attraction
+     * @param user
+     * @return Reward's point
+     */
     public int getRewardPointsExterne(Attraction attraction, User user) {
         //logger.debug("getRewardPointsExterne");
         String rewardCentralURL = "http://localhost:8081/AttractionRewardPoints/?";

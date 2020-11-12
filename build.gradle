@@ -18,8 +18,9 @@ apply plugin: "jacoco"
 
 
 bootJar {
-    baseName = 'tourGuide'
-    version =  '1.0.0'
+    //baseName = 'tourGuide'
+    group 'com.tourGuide'
+    version '1.0-SNAPSHOT'
 }
 
 repositories {

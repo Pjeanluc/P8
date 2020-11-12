@@ -2,8 +2,6 @@ package tourGuide.service;
 
 
 import java.util.concurrent.CopyOnWriteArrayList;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import gpsUtil.GpsUtil;
@@ -22,7 +20,7 @@ public class RewardsService {
 	// proximity in miles
     private final int defaultProximityBuffer = 10;
 	private int proximityBuffer = defaultProximityBuffer;
-	private final int attractionProximityRange = 2000;
+	private final int attractionProximityRange = 200;
 	private final GpsUtil gpsUtil;
 	private final RewardCentralProxy rewardsCentralProxy;
 
